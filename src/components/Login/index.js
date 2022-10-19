@@ -1,6 +1,7 @@
 import './index.css'
 import {Component} from 'react'
 import Cookies from 'js-cookie'
+import {Redirect} from 'react-router-dom'
 
 class Login extends Component {
   state = {
@@ -17,12 +18,12 @@ class Login extends Component {
     this.setState({password: event.target.value})
   }
 
-  onSubmitSuccess = jwtToken => {
-    console.log(jwtToken)
-    Cookies.set('js_token', jwtToken, {expires: 2})
+  onSubmitSuccess = token => {
+    console.log(token)
+    Cookies.set('jwt_token', token, {expires: 2})
     this.setState({errorMsg: ''})
     const {history} = this.props
-    history.push('/')
+    history.replace('/')
   }
 
   fetchLogin = async () => {
@@ -52,6 +53,11 @@ class Login extends Component {
 
   render() {
     const {username, password, errorMsg} = this.state
+    const jwtToken = Cookies.get('jwt_token')
+    console.log(jwtToken)
+    if (jwtToken !== undefined) {
+      return <Redirect to="/" />
+    }
 
     return (
       <div className="login-bg-container">
