@@ -2,3 +2,26 @@
   background-color: #272727;
   min-height: 100vh;
 }
+.jobs-main-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.left-container {
+  width: 250px;
+  margin: 15px;
+}
+.right-container {
+  width: auto;
+  margin: 15px;
+}
+.profile-bg {
+  background-image: url('https://assets.ccbp.in/frontend/react-js/profile-bg.png');
+  background-size: cover;
+  padding: 5px;
+}
+.ul-container {
+  list-style-type: none;
+  padding: 0px;
+  color: #ffffff;
+}
