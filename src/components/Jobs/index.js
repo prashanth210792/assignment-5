@@ -58,12 +58,10 @@ class Jobs extends Component {
   fetchJobs = async () => {
     const {employementType, minimumPackage, searchValue} = this.state
     const selectedEmpType = employementType.join(',')
-    // console.log(selectedEmpType)
 
     const jwtToken = Cookies.get('jwt_token')
-    // const url = 'https://apis.ccbp.in/jobs'
     const url = `https://apis.ccbp.in/jobs?employment_type=${selectedEmpType}&minimum_package=${minimumPackage}&search=${searchValue}`
-    //   'https://apis.ccbp.in/jobs?employment_type=FULLTIME,PARTTIME&minimum_package=1000000&search='
+
     console.log(url)
     const options = {
       method: 'GET',
@@ -76,7 +74,6 @@ class Jobs extends Component {
     // console.log(response)
     // console.log(data)
     if (response.ok) {
-      //   console.log(data)
       const camelCasedData = data.jobs.map(each => ({
         companyLogoUrl: each.company_logo_url,
         employmentType: each.employment_type,
