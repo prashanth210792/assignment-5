@@ -60,9 +60,16 @@ class Jobs extends Component {
     jobs: [],
     searchValue: '',
     apiStatus: apiStatusList.inProgress,
+    // _____________________
+    profileDetails: {},
+    profileFailed: false,
+    // _____________________-__
   }
 
   componentDidMount() {
+    // ________________________
+    this.fetchProfile()
+    // ____________________________
     this.fetchJobs()
   }
 
@@ -84,27 +91,23 @@ class Jobs extends Component {
     const data = await response.json()
     // console.log(response)
     console.log(data.total)
-
     if (data.status_code === 401) {
       const {history} = this.props
       history.replace('/login')
     }
-    if (response.ok) {
-      if (data.total > 0) {
-        const camelCasedData = data.jobs.map(each => ({
-          companyLogoUrl: each.company_logo_url,
-          employmentType: each.employment_type,
-          id: each.id,
-          jobDescription: each.job_description,
-          location: each.location,
-          packagePerAnnum: each.package_per_annum,
-          rating: each.rating,
-          title: each.title,
-        }))
-        this.setState({jobs: camelCasedData, apiStatus: apiStatusList.success})
-      } else {
-        this.setState({apiStatus: apiStatusList.noData})
-      }
+
+    if (response.ok === true) {
+      const camelCasedData = data.jobs.map(each => ({
+        companyLogoUrl: each.company_logo_url,
+        employmentType: each.employment_type,
+        id: each.id,
+        jobDescription: each.job_description,
+        location: each.location,
+        packagePerAnnum: each.package_per_annum,
+        rating: each.rating,
+        title: each.title,
+      }))
+      this.setState({jobs: camelCasedData, apiStatus: apiStatusList.success})
     } else {
       this.setState({apiStatus: apiStatusList.failed})
     }
@@ -170,13 +173,22 @@ class Jobs extends Component {
   }
 
   successView = () => {
-    const {jobs, searchValue} = this.state
+    // const {jobs, searchValue} = this.state
+    const {jobs, searchValue, profileDetails, profileFailed} = this.state
+
     return (
       <div className="jobs-container">
         <Header />
         <div className="jobs-main-container">
           <div className="left-container">
-            <Profile />
+            {/* _______________________________ */}
+            {/* <Profile /> */}
+            {/* ____________________________________ */}
+            <Profile
+              details={profileDetails}
+              profileFailedDetails={profileFailed}
+              callApiProfile={this.fetchProfile}
+            />
             <hr />
             <div>
               <h1>Type of Employment</h1>
@@ -206,9 +218,12 @@ class Jobs extends Component {
               {/* <button type="button" onClick={this.searchInputs}> */}
               search
             </button>
-            {jobs.map(each => (
+            {jobs.length === 0
+              ? this.noDataView()
+              : jobs.map(each => <JobsItem details={each} key={each.id} />)}
+            {/* {jobs.map(each => (
               <JobsItem details={each} key={each.id} />
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
@@ -222,10 +237,8 @@ class Jobs extends Component {
         alt="failure view"
       />
       <h1>Oops! Something Went Wrong</h1>
-      <p>We cannot seem to find the page you are looking for</p>{' '}
-      <Link to="/jobs">
-        <button type="button">Retry</button>
-      </Link>
+      <p>We cannot seem to find the page you are looking for</p>
+      <button type="button">Retry</button>
     </div>
   )
 
@@ -236,7 +249,7 @@ class Jobs extends Component {
         alt="no jobs"
       />
       <h1>No Jobs Found</h1>
-      <p>We could not find any jobs. Try other filters</p>{' '}
+      <p>We could not find any jobs. Try other filters</p>
       <Link to="/jobs">
         <button type="button">Retry</button>
       </Link>
@@ -249,6 +262,35 @@ class Jobs extends Component {
       <Loader type="TailSpin" color="#00BFFF" height={80} width={80} />
     </div>
   )
+
+  //   ___________________________________________
+
+  fetchProfile = async () => {
+    const jwtToken = Cookies.get('jwt_token')
+    const url = 'https://apis.ccbp.in/profile'
+    const options = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+
+    const response = await fetch(url, options)
+    const data = await response.json()
+
+    if (response.ok) {
+      const camelCasedData = {
+        name: data.profile_details.name,
+        profileImageUrl: data.profile_details.profile_image_url,
+        shortBio: data.profile_details.short_bio,
+      }
+      this.setState({profileDetails: camelCasedData})
+    } else {
+      this.setState({profileFailed: true})
+    }
+  }
+
+  //   ___________________________________________
 
   render() {
     const {apiStatus} = this.state

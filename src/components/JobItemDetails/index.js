@@ -44,10 +44,6 @@ class JobItemDetails extends Component {
     console.log(response)
     const data = await response.json()
     console.log(data)
-    if (data.status_code === 401) {
-      const {history} = this.props
-      history.replace('/login')
-    }
 
     if (response.ok) {
       //   console.log(data)
@@ -97,6 +93,11 @@ class JobItemDetails extends Component {
       })
     } else {
       this.setState({apiStatus: apiStatusList.failed})
+    }
+
+    if (data.status_code === 401) {
+      const {history} = this.props
+      history.replace('/login')
     }
   }
 
