@@ -81,7 +81,7 @@ class Login extends Component {
             <label htmlFor="password">PASSWORD</label>
             <br />
             <input
-              type="text"
+              type="password"
               id="password"
               className="input-container"
               placeholder="password"

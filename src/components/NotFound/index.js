@@ -9,7 +9,7 @@ const NotFound = () => (
       alt="not found"
     />
     <h1>Page Not Found</h1>
-    <p>were are sorry</p>
+    <p>we're sorry, the page you requested could not be found</p>
   </>
 )
 export default NotFound

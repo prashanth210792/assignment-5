@@ -1,5 +1,7 @@
 import './index.css'
 import Cookies from 'js-cookie'
+import {Link} from 'react-router-dom'
+import Loader from 'react-loader-spinner'
 import {Component} from 'react'
 import {Header} from '../Header/index'
 import {Profile} from '../Profile'
@@ -43,12 +45,21 @@ const salaryRangesList = [
   },
 ]
 
+const apiStatusList = {
+  initial: 'INITIAL',
+  success: 'SUCCESS',
+  failed: 'FAILED',
+  inProgress: 'INPROGRESS',
+  noData: 'NODATA',
+}
+
 class Jobs extends Component {
   state = {
     employementType: [],
     minimumPackage: 0,
     jobs: [],
     searchValue: '',
+    apiStatus: apiStatusList.inProgress,
   }
 
   componentDidMount() {
@@ -72,19 +83,30 @@ class Jobs extends Component {
     const response = await fetch(url, options)
     const data = await response.json()
     // console.log(response)
-    // console.log(data)
+    console.log(data.total)
+
+    if (data.status_code === 401) {
+      const {history} = this.props
+      history.replace('/login')
+    }
     if (response.ok) {
-      const camelCasedData = data.jobs.map(each => ({
-        companyLogoUrl: each.company_logo_url,
-        employmentType: each.employment_type,
-        id: each.id,
-        jobDescription: each.job_description,
-        location: each.location,
-        packagePerAnnum: each.package_per_annum,
-        rating: each.rating,
-        title: each.title,
-      }))
-      this.setState({jobs: camelCasedData})
+      if (data.total > 0) {
+        const camelCasedData = data.jobs.map(each => ({
+          companyLogoUrl: each.company_logo_url,
+          employmentType: each.employment_type,
+          id: each.id,
+          jobDescription: each.job_description,
+          location: each.location,
+          packagePerAnnum: each.package_per_annum,
+          rating: each.rating,
+          title: each.title,
+        }))
+        this.setState({jobs: camelCasedData, apiStatus: apiStatusList.success})
+      } else {
+        this.setState({apiStatus: apiStatusList.noData})
+      }
+    } else {
+      this.setState({apiStatus: apiStatusList.failed})
     }
   }
 
@@ -111,8 +133,9 @@ class Jobs extends Component {
           type="checkbox"
           value={employmentTypeId}
           onChange={this.selectEmploymentType}
+          id={employmentTypeId}
         />
-        <label>{label}</label>
+        <label htmlFor={employmentTypeId}>{label}</label>
       </li>
     )
   }
@@ -131,8 +154,9 @@ class Jobs extends Component {
           value={salaryRangeId}
           onChange={this.selectSalaryRange}
           name="salary"
+          id={salaryRangeId}
         />
-        <label>{label}</label>
+        <label htmlFor={salaryRangeId}>{label}</label>
       </li>
     )
   }
@@ -145,12 +169,8 @@ class Jobs extends Component {
     this.fetchJobs()
   }
 
-  render() {
+  successView = () => {
     const {jobs, searchValue} = this.state
-    const {employementType, minimumPackage} = this.state
-    // console.log(employementType)
-    // console.log(minimumPackage)
-
     return (
       <div className="jobs-container">
         <Header />
@@ -178,7 +198,12 @@ class Jobs extends Component {
               value={searchValue}
               onChange={this.searchedJob}
             />
-            <button type="button" onClick={this.searchInputs}>
+            <button
+              type="button"
+              onClick={this.searchInputs}
+              testid="searchButton"
+            >
+              {/* <button type="button" onClick={this.searchInputs}> */}
               search
             </button>
             {jobs.map(each => (
@@ -188,6 +213,65 @@ class Jobs extends Component {
         </div>
       </div>
     )
+  }
+
+  failureView = () => (
+    <div>
+      <img
+        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+        alt="failure view"
+      />
+      <h1>Oops! Something Went Wrong</h1>
+      <p>We cannot seem to find the page you are looking for</p>{' '}
+      <Link to="/jobs">
+        <button type="button">Retry</button>
+      </Link>
+    </div>
+  )
+
+  noDataView = () => (
+    <div>
+      <img
+        src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+        alt="no jobs"
+      />
+      <h1>No Jobs Found</h1>
+      <p>We could not find any jobs. Try other filters</p>{' '}
+      <Link to="/jobs">
+        <button type="button">Retry</button>
+      </Link>
+    </div>
+  )
+
+  loading = () => (
+    <div testid="loader">
+      {/* <div> */}
+      <Loader type="TailSpin" color="#00BFFF" height={80} width={80} />
+    </div>
+  )
+
+  render() {
+    const {apiStatus} = this.state
+    // const {employementType, minimumPackage} = this.state
+    // console.log(employementType)
+    // console.log(minimumPackage)
+
+    switch (apiStatus) {
+      case apiStatusList.inProgress:
+        return this.loading()
+
+      case apiStatusList.success:
+        return this.successView()
+
+      case apiStatusList.failed:
+        return this.failureView()
+
+      case apiStatusList.noData:
+        return this.noDataView()
+
+      default:
+        return null
+    }
   }
 }
 export default Jobs

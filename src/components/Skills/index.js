@@ -5,7 +5,7 @@ export const Skills = props => {
   const {name, imageUrl} = details
   return (
     <li>
-      <img src={imageUrl} alt="img" />
+      <img src={imageUrl} alt={name} />
       <h1>{name}</h1>
     </li>
   )

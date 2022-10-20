@@ -1,7 +1,6 @@
 import './index.css'
-import Cookies from 'js-cookie'
-// import {Redirect} from 'react-router-dom'
 import {Link, withRouter} from 'react-router-dom'
+import Cookies from 'js-cookie'
 
 export const Header = props => {
   //   console.log(props)
@@ -12,19 +11,25 @@ export const Header = props => {
   }
 
   return (
-    <div className="header-bg-container">
-      <img
-        src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
-        alt="website logo"
-      />
-      <div className="container">
+    <ul className="header-bg-container">
+      <Link to="/">
+        <li>
+          <img
+            src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
+            alt="website logo"
+          />
+        </li>
+      </Link>
+      <li className="container">
         <Link to="/">Home</Link>
         <Link to="/jobs">Jobs</Link>
-      </div>
+      </li>
+      <li>pp</li>
+
       <button type="button" className="btn-logout" onClick={logoutUser}>
         Logout
       </button>
-    </div>
+    </ul>
   )
 }
 export default withRouter(Header)

@@ -16,14 +16,14 @@ export const JobsItem = props => {
   return (
     <Link to={`/jobs/${id}`}>
       <div className="jobItem-bg-container">
-        <img className="logo" src={companyLogoUrl} alt="logo" />
+        <img className="logo" src={companyLogoUrl} alt="company logo" />
         <h1>{title}</h1>
         <p>{rating}</p>
         <p>{location}</p>
         <p>{employmentType}</p>
         <p>{packagePerAnnum}</p>
         <hr />
-        <p>Description</p>
+        <h1>Description</h1>
         <p>{jobDescription}</p>
       </div>
     </Link>

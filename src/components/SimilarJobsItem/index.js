@@ -14,7 +14,7 @@ export const SimilarJobsItem = props => {
 
   return (
     <li className="li-similarJobItem">
-      <img src={companyLogoUrl} alt="logo" />
+      <img src={companyLogoUrl} alt="similar job company logo" />
       <h1>{title}</h1>
       <p>{rating}</p>
       <h1>Description</h1>
