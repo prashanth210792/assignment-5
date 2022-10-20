@@ -1,6 +1,9 @@
 import './index.css'
+import Cookies from 'js-cookie'
 import {Component} from 'react'
 import {Header} from '../Header/index'
+import {Profile} from '../Profile'
+import {JobsItem} from '../JobsItem'
 
 const employmentTypesList = [
   {
@@ -44,14 +47,49 @@ class Jobs extends Component {
   state = {
     employementType: [],
     minimumPackage: 0,
+    jobs: [],
+    searchValue: '',
   }
 
-  profile = () => (
-    <div className="profile-bg">
-      <h1>Rahul Athuluri</h1>
-      <p>Lead Software Engineer</p>
-    </div>
-  )
+  componentDidMount() {
+    this.fetchJobs()
+  }
+
+  fetchJobs = async () => {
+    const {employementType, minimumPackage, searchValue} = this.state
+    const selectedEmpType = employementType.join(',')
+    // console.log(selectedEmpType)
+
+    const jwtToken = Cookies.get('jwt_token')
+    // const url = 'https://apis.ccbp.in/jobs'
+    const url = `https://apis.ccbp.in/jobs?employment_type=${selectedEmpType}&minimum_package=${minimumPackage}&search=${searchValue}`
+    //   'https://apis.ccbp.in/jobs?employment_type=FULLTIME,PARTTIME&minimum_package=1000000&search='
+    console.log(url)
+    const options = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    }
+    const response = await fetch(url, options)
+    const data = await response.json()
+    // console.log(response)
+    // console.log(data)
+    if (response.ok) {
+      //   console.log(data)
+      const camelCasedData = data.jobs.map(each => ({
+        companyLogoUrl: each.company_logo_url,
+        employmentType: each.employment_type,
+        id: each.id,
+        jobDescription: each.job_description,
+        location: each.location,
+        packagePerAnnum: each.package_per_annum,
+        rating: each.rating,
+        title: each.title,
+      }))
+      this.setState({jobs: camelCasedData})
+    }
+  }
 
   selectEmploymentType = event => {
     const {employementType} = this.state
@@ -60,10 +98,10 @@ class Jobs extends Component {
     const isChecked = event.target.checked
     const updatedList = [...employementType, currentValue]
     if (isChecked) {
-      this.setState({employementType: updatedList})
+      this.setState({employementType: updatedList}, this.fetchJobs)
     } else {
       const filteredList = employementType.filter(each => each !== currentValue)
-      this.setState({employementType: filteredList})
+      this.setState({employementType: filteredList}, this.fetchJobs)
     }
   }
 
@@ -83,7 +121,7 @@ class Jobs extends Component {
   }
 
   selectSalaryRange = event => {
-    this.setState({minimumPackage: event.target.value})
+    this.setState({minimumPackage: event.target.value}, this.fetchJobs)
   }
 
   salaryRange = each => {
@@ -102,8 +140,17 @@ class Jobs extends Component {
     )
   }
 
+  searchedJob = event => {
+    this.setState({searchValue: event.target.value})
+  }
+
+  searchInputs = () => {
+    this.fetchJobs()
+  }
+
   render() {
-    // const {employementType, minimumPackage} = this.state
+    const {jobs, searchValue} = this.state
+    const {employementType, minimumPackage} = this.state
     // console.log(employementType)
     // console.log(minimumPackage)
 
@@ -112,7 +159,7 @@ class Jobs extends Component {
         <Header />
         <div className="jobs-main-container">
           <div className="left-container">
-            {this.profile()}
+            <Profile />
             <hr />
             <div>
               <h1>Type of Employment</h1>
@@ -129,7 +176,17 @@ class Jobs extends Component {
             </div>
           </div>
           <div className="right-container">
-            <input type="search" />
+            <input
+              type="search"
+              value={searchValue}
+              onChange={this.searchedJob}
+            />
+            <button type="button" onClick={this.searchInputs}>
+              search
+            </button>
+            {jobs.map(each => (
+              <JobsItem details={each} key={each.id} />
+            ))}
           </div>
         </div>
       </div>

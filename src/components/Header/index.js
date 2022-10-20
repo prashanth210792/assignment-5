@@ -4,7 +4,7 @@ import Cookies from 'js-cookie'
 import {Link, withRouter} from 'react-router-dom'
 
 export const Header = props => {
-  console.log(props)
+  //   console.log(props)
   const logoutUser = () => {
     const {history} = props
     Cookies.remove('jwt_token')

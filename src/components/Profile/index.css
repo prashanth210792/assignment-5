@@ -1,0 +1,7 @@
+.profile-bg {
+  background-image: url('https://assets.ccbp.in/frontend/react-js/profile-bg.png');
+  background-size: cover;
+  padding: 5px;
+  height: 200px;
+  border-radius: 10px;
+}

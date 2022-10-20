@@ -1,0 +1,11 @@
+.jobItem-bg-container {
+  min-height: 300px;
+  border-radius: 10px;
+  background-color: #2c364c;
+  padding: 10px;
+  margin-bottom: 5px;
+  color: #ffffff;
+}
+.logo {
+  height: 20px;
+}
